@@ -1,13 +1,14 @@
 #ifndef __CPP_THREAD_H__
 #define __CPP_THREAD_H__
 #if defined(LINUX) || defined(UNIX)
-#include <pthread>
+#include <pthread.h>
+// note: pthread_t on macosx is a struct while on linux it is an unsigned long
 typedef pthread_t threadid_t;
 typedef pthread_attr_t thread_attr_t;
 typedef void* thread_args_t;
-typedef int thread_handle_t;
-// Thread_create(tid,attr,routine,arg) pthread_create(ref, attr, routine, arg)
-// Thread_join() pthread_join()
+typedef pthread_t thread_handle_t;
+#define Thread_Join(handle) pthread_join(handle)
+#define Thread_Close(handle) pthread_exit(nullptr)
 #endif
 #if defined(WINDOWS) || defined(WIN32) || defined (win32)
 #include <windows.h>
@@ -16,21 +17,29 @@ typedef LPDWORD threadid_t;
 typedef LPSECURITY_ATTRIBUTES thread_attr_t;
 typedef LPVOID thread_args_t;
 typedef HANDLE thread_handle_t;
-// Thread_create(tid,attr,routine,arg) CreateThread(attr, stack, routine, arg, create_flags, id)
-// Thread_join() WaitForSingleObject(handle,INFINITE)
+#define Thread_Join(handle) WaitForSingleObject(handle,INFINITE)
+#define Thread_Close(handle) CloseHandle(handle)
 #endif
-typedef void (*threadfunc_t)(void *);
+#define threadid_init(id) id = (threadid_t)malloc(sizeof(threadid_t))
+#define thread_handle_init(handle) handle = (thread_handle_t)malloc(sizeof(thread_handle_t))
+typedef void* (*threadfunc_t)(thread_args_t);
+
 
 class CppThread {
         public:
                 // constr
-                explicit CppThread(threadfunc_t func, thread_args_t);
-                void start();
+                CppThread(threadfunc_t func, thread_args_t args);
+                CppThread(threadfunc_t func, thread_attr_t attr, thread_args_t args);
+                int start();
                 void join();
                 virtual ~CppThread();
         private:
-                threadid_t tid;
+                threadid_t* tid; // on windows this is LPDWORD
                 threadfunc_t func;
+                thread_attr_t attr;
+                thread_args_t args;
+                thread_handle_t* handle; // on linux this is the same as the threadid_t field
+                int threadInit();
 
 }; 
 #endif
