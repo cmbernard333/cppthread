@@ -4,3 +4,10 @@ Makfile
 .project
 build
 makefile.bak
+*.sdf
+*.suo
+*.idb
+*.lib
+*.opensdf
+*.sln
+*.pdb
