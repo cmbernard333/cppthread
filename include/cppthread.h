@@ -9,20 +9,23 @@ typedef void* thread_args_t;
 typedef pthread_t thread_handle_t;
 #define Thread_Join(handle) pthread_join(handle)
 #define Thread_Close(handle) pthread_exit(nullptr)
+typedef void* (*threadfunc_t)(thread_args_t);
 #endif
 #if defined(WINDOWS) || defined(WIN32) || defined (win32)
 #include <windows.h>
 #pragma once
-typedef LPDWORD threadid_t;
+typedef DWORD threadid_t;
 typedef LPSECURITY_ATTRIBUTES thread_attr_t;
 typedef LPVOID thread_args_t;
 typedef HANDLE thread_handle_t;
+typedef LPTHREAD_START_ROUTINE threadfunc_t;
 #define Thread_Join(handle) WaitForSingleObject(handle,INFINITE)
 #define Thread_Close(handle) CloseHandle(handle)
 #endif
-#define threadid_init(id) id = (threadid_t)malloc(sizeof(threadid_t))
-#define thread_handle_init(handle) handle = (thread_handle_t)malloc(sizeof(thread_handle_t))
-typedef void* (*threadfunc_t)(thread_args_t);
+
+/* generalized aliases */
+#define threadid_init(id) id = (threadid_t*)malloc(sizeof(threadid_t))
+#define thread_handle_init(handle) handle = (thread_handle_t*)malloc(sizeof(thread_handle_t))
 
 
 class CppThread {
@@ -34,7 +37,7 @@ class CppThread {
                 void join();
                 virtual ~CppThread();
         private:
-                threadid_t* tid; // on windows this is LPDWORD
+                threadid_t* tid; // on windows this is DWORD
                 threadfunc_t func;
                 thread_attr_t attr;
                 thread_args_t args;

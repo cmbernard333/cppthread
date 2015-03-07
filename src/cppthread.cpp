@@ -13,6 +13,10 @@ CppThread::CppThread(threadfunc_t tFunc, thread_attr_t attrs, thread_args_t tArg
 CppThread::~CppThread() {
 }
 
+/* TODO : pthread_create and CreateThread should start the thread in suspended mode
+[ ] pthread_create ->
+[X] create_thread -> CREATE_SUSPENDED
+*/
 int CppThread::threadInit() {
 #if defined(LINUX) || defined(UNIX)
 	int rc = pthread_create(this->tid, &this->attr, this->func, this->args);
@@ -21,14 +25,17 @@ int CppThread::threadInit() {
 	}
 	return rc;
 #elif defined (WINDOWS) || defined (WIN32) || defined (win32)
-	this->handle = CreateThread(this->attr, nullptr, this->func, this->args, nullptr, &this->tid)
-	return ref!=nullptr ? 0 : 1;
+	/* first zero is stack-size which if set to 0 is now 1MB*/
+	/* second zero is the creation flag which if set to 0 means the thread runs immediately*/
+	*(this->handle) = CreateThread(this->attr, 0, this->func, this->args, CREATE_SUSPENDED, this->tid);
+	return (*((this->handle))!=NULL ? 0 : 1);
 #endif
 }
 
 
 int CppThread::start() {
 	threadInit();
+	return 0;
 }
 void CppThread::join() {
 	Thread_Join(this->handle);
