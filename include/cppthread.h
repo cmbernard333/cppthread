@@ -7,7 +7,8 @@ typedef pthread_t threadid_t;
 typedef pthread_attr_t thread_attr_t;
 typedef void* thread_args_t;
 typedef pthread_t thread_handle_t;
-#define Thread_Join(handle) pthread_join(handle)
+#define Thread_Join(handle) pthread_join(handle,NULL)
+#define Thread_Join(handle,pRetVal) pthread_join(handle,pRetVal)
 #define Thread_Close(handle) pthread_exit(nullptr)
 typedef void* (*threadfunc_t)(thread_args_t);
 #endif
