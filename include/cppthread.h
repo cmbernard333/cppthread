@@ -9,8 +9,9 @@ typedef void* thread_args_t;
 typedef pthread_t thread_handle_t;
 #define Thread_Join(handle) pthread_join(handle,NULL)
 #define Thread_Join(handle,pRetVal) pthread_join(handle,pRetVal)
-#define Thread_Close(handle) pthread_exit(nullptr)
 typedef void* (*threadfunc_t)(thread_args_t);
+/*TODO: this causes the thread exit but doesn't destroy the handle */
+#define Thread_Close(handle) pthread_exit(nullptr)
 #endif
 #if defined(WINDOWS) || defined(WIN32) || defined (win32)
 #include <windows.h>
@@ -20,13 +21,17 @@ typedef LPSECURITY_ATTRIBUTES thread_attr_t;
 typedef LPVOID thread_args_t;
 typedef HANDLE thread_handle_t;
 typedef LPTHREAD_START_ROUTINE threadfunc_t;
-#define Thread_Join(handle) WaitForSingleObject(handle,INFINITE)
+/*TODO: thread joining is slightly different on windows because WaitForSingleObject returns the exit status while GetExitCodeThread actually gets the status*/
+#define Thread_Join(handle) WaitForSingleObject(handle,INFINITE); GetExitCodeThread(handle,NULL)
+/*TODO: this doesn't exit the thread it destroys the handle */
 #define Thread_Close(handle) CloseHandle(handle)
 #endif
 
 /* generalized aliases */
 #define threadid_init(id) id = (threadid_t*)malloc(sizeof(threadid_t))
 #define thread_handle_init(handle) handle = (thread_handle_t*)malloc(sizeof(thread_handle_t))
+#define threadit_safe_destroy(id) if(id) free(id)
+#define thread_handle_safe_destroy(handle) if(handle) free(handle)
 
 
 class CppThread {
