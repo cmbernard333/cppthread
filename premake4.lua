@@ -3,19 +3,21 @@ solution "CppThread"
     configurations { "Debug", "Release" }
     -- A project defines one build target
     project "CppThread"
-        kind "StaticLib"
+        kind "SharedLib"
         language "C++"
+        buildoptions { "-std=c++0x" }
         -- place where sources are -- should also include header files for vs2013
-        files {  "src/**.cpp", "include/**.hpp", "include/**.h" }
+        files {  "include/cppthread.h" }
         -- the output location
         location "build"
         -- includes 
         includedirs { "include" }
         
         if os.get() == "windows" then
+            files { "src/cppthreadwin.cpp" }
             defines { "windows", "win32", "WINDOWS" }
         else
-	    -- linking
+            files { "src/cppthreadposix.cpp" }
             links { "pthread" }
             defines { "unix", "UNIX", "linux", "LINUX" }
         end
