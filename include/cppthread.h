@@ -16,8 +16,9 @@ typedef pthread_t thread_handle_t;
 #endif
 
 #if defined(WINDOWS) || defined(WIN32) || defined (win32)
-#include <windows.h>
 #pragma once
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 typedef DWORD threadid_t;
 typedef LPSECURITY_ATTRIBUTES thread_attr_t;
 typedef LPVOID thread_args_t;
@@ -27,6 +28,7 @@ typedef LPTHREAD_START_ROUTINE threadfunc_t;
 #define Thread_Join(handle,pRetVal) WaitForSingleObject(handle,INFINITE); GetExitCodeThread(handle,pRetVal)
 /*TODO: this doesn't exit the thread it destroys the handle */
 #define Thread_Close(handle) CloseHandle(handle)
+#define thread_attr_init(attr) (LPSECURITY_ATTRIBUTES) malloc(SECURITY_DESCRIPTOR_MIN_LENGTH);
 #endif
 
 /* generalized aliases */
