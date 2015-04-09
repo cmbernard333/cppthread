@@ -5,11 +5,12 @@ solution "CppThread"
     project "CppThread"
         kind "SharedLib"
         language "C++"
-        buildoptions { "-std=c++0x" }
+        -- buildoptions { "-std=c++0x" }
         -- place where sources are -- should also include header files for vs2013
         files {  "include/cppthread.h" }
         -- the output location
         location "build"
+        targetdir "build/lib"
         -- includes 
         includedirs { "include" }
         
@@ -28,3 +29,12 @@ solution "CppThread"
 
         configuration "Release"
             flags { "Optimize" }
+    project "CppThreadTest"
+        kind "ConsoleApp"
+        language "C++"
+        location "build"
+        includedirs { "include" }
+        files { "test/src/**.cpp", "test/include/**.h" }
+        libdirs { "build/lib" }
+        links { "CppThread" }
+        
