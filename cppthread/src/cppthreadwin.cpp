@@ -6,19 +6,19 @@
  */
 #include "cppthread.h"
 
-CppThread::CppThread(threadfunc_t tFunc, thread_args_t tArgs) : func(tFunc), args(tArgs) {
+CppThread::CppThread(thread_func_t tFunc, thread_args_t tArgs) : func(tFunc), args(tArgs) {
 	thread_attr_init(&this->attr);
 	thread_id_init(this->tid);
 	thread_handle_init(this->handle);
 }
 
-CppThread::CppThread(threadfunc_t tFunc, thread_attr_t attrs, thread_args_t tArgs) : func(tFunc), attr(attrs), args(tArgs) {
+CppThread::CppThread(thread_func_t tFunc, thread_attr_t attrs, thread_args_t tArgs) : func(tFunc), attr(attrs), args(tArgs) {
 	thread_id_init(this->tid);
 	thread_handle_init(this->handle);
 }
 
 CppThread::~CppThread() {
-	threadit_safe_destroy(this->tid);
+	thread_id_safe_destroy(this->tid);
 	thread_handle_safe_destroy(this->handle);
 }
 
@@ -30,6 +30,11 @@ int CppThread::threadInit() {
 	/* second zero is the creation flag which if set to 0 means the thread runs immediately*/
 	*(this->handle) = CreateThread(this->attr, 0, this->func, this->args, CREATE_SUSPENDED, this->tid);
 	return (*((this->handle))!=NULL ? 0 : 1);
+}
+
+int CppThread::start() {
+	threadInit();
+	ResumeThread(this->handle);
 }
 
 

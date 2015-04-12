@@ -41,7 +41,7 @@ typedef LPTHREAD_START_ROUTINE thread_func_t;
 class CppThread {
         public:
                 // constr
-                CppThread(thread_func_t func, thread_args_t args);
+                CppThread(thread_func_t func, thread_args_t args = NULL);
                 CppThread(thread_func_t func, thread_attr_t attr, thread_args_t args);
                 int start();
                 int join();

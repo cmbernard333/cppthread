@@ -29,7 +29,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL Windows)
 else()
 	set ( CppThreadLibImpl ${SRC_DIR}/cppthreadposix.cpp )
 endif()
-add_library( CppThreadLib SHARED ${CppThreadLibImpl}) 
+add_library( CppThreadLib SHARED ${CppThreadLibImpl} ${CppThreadLibHeaders}) 
 # link pthread on linux
 if(APPLE OR CMAKE_SYSTEM_NAME STREQUAL Linux)
 	target_link_libraries( CppThreadLib pthread)
